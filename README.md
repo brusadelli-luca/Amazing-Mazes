@@ -1,4 +1,4 @@
-# Amazing-Mazes
+# Mazes
 Mazes generation and exploring
 
 Maze generation with Recursive BackTrack algorithm
