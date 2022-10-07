@@ -7,15 +7,14 @@ class Maze:
     def __init__(self,N):
         self.N = N
 
-        self.maze_cells = []
-
+        self.cells = []
         for I in range(N):
-            self.maze_cells.append([])
+            self.cells.append([])
             for J in range(N):
-                self.maze_cells[I].append(Cell(self,I,J))
+                self.cells[I].append(Cell(I,J))
     
-        self.maze_cells[0][0].walls['W'] = False
-        self.maze_cells[N-1][N-1].walls['E'] = False
+        self.cells[0][0].walls['W'] = False
+        self.cells[N-1][N-1].walls['E'] = False
 
     def __str__(self):
         wall = {True:'#', False:'.'}
@@ -29,16 +28,16 @@ class Maze:
 
             for J in range(self.N):
 
-                maze_out_W = maze_out_W + '#' + wall[self.maze_cells[I][J].walls['N']]
-                maze_out_C = maze_out_C + wall[self.maze_cells[I][J].walls['W']] + self.maze_cells[I][J].symbol
+                maze_out_W = maze_out_W + '#' + wall[self.cells[I][J].walls['N']]
+                maze_out_C = maze_out_C + wall[self.cells[I][J].walls['W']] + self.cells[I][J].symbol
             
             maze_out_W = maze_out_W + "#"
-            maze_out_C = maze_out_C + wall[self.maze_cells[I][J].walls['E']]
+            maze_out_C = maze_out_C + wall[self.cells[I][J].walls['E']]
             maze_out = maze_out + '\n' + maze_out_W + '\n' + maze_out_C
 
         maze_out_W = ''
         for J in range(self.N):
-            maze_out_W = maze_out_W + '#' + wall[self.maze_cells[I][J].walls['S']]
+            maze_out_W = maze_out_W + '#' + wall[self.cells[I][J].walls['S']]
         maze_out_W = maze_out_W + "#"
         
         maze_out = maze_out + '\n' + maze_out_W            
@@ -49,8 +48,20 @@ class Maze:
         fichier = open(file_name + '.txt',"w")
         fichier.write(str(self))
 
+    def available_dir(self,cell):
+        dir_list = []
+        if not (cell.X == 0 or self.cells[cell.X-1][cell.Y].visited == True):
+            dir_list.append('N')
+        if not (cell.Y == self.N-1 or self.cells[cell.X][cell.Y+1].visited == True):
+            dir_list.append('E')
+        if not (cell.X == self.N-1 or self.cells[cell.X+1][cell.Y].visited == True):
+            dir_list.append('S')
+        if not (cell.Y == 0 or self.cells[cell.X][cell.Y-1].visited == True):
+            dir_list.append('W')
+        return dir_list
+
 class Cell:
-    def __init__(self,maze,X,Y):
+    def __init__(self,X,Y):
         self.X = X
         self.Y = Y
 
@@ -61,7 +72,6 @@ class Cell:
                         'S' : True
                         }
 
-        self.maze = maze
         self.symbol = '.'
         self.visited = False
 
@@ -83,40 +93,5 @@ class Cell:
             return False
 
     def break_wall(self,dir):
-        walls_pairs = {
-                            'N' : 'S',
-                            'S' : 'N',
-                            'E' : 'W',
-                            'W' : 'E'
-                        }
-        
-        if dir == 'N':
-            prev_X = self.X-1
-            prev_Y = self.Y
-
-        elif dir == 'E':
-            prev_X = self.X
-            prev_Y = self.Y+1
-
-        elif dir == 'S':
-            prev_X = self.X+1
-            prev_Y = self.Y
-
-        elif dir == 'W':
-            prev_X = self.X
-            prev_Y = self.Y-1
 
         self.walls[dir] = False
-        self.maze.maze_cells[prev_X][prev_Y].walls[walls_pairs[dir]] = False
-
-    def available_dir(self):
-        dir_list = []
-        if not (self.X == 0 or self.maze.maze_cells[self.X-1][self.Y].visited == True):
-            dir_list.append('N')
-        if not (self.Y == self.maze.N-1 or self.maze.maze_cells[self.X][self.Y+1].visited == True):
-            dir_list.append('E')
-        if not (self.X == self.maze.N-1 or self.maze.maze_cells[self.X+1][self.Y].visited == True):
-            dir_list.append('S')
-        if not (self.Y == 0 or self.maze.maze_cells[self.X][self.Y-1].visited == True):
-            dir_list.append('W')
-        return dir_list
